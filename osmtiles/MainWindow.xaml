@@ -1,0 +1,34 @@
+﻿<Window x:Class="osmtiles.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:osmtiles"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="550" Width="260">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <StackPanel Margin="5,10">
+                <TextBlock Margin="0,10,0,0" Text="LatTopLeft" />
+                <TextBox x:Name="txtLatTL" Text="50" />
+                <TextBlock Margin="0,10,0,0" Text="LongTopLeft" />
+                <TextBox x:Name="txtLongTL" Text="-50" />
+                <TextBlock Margin="0,10,0,0" Text="LatBottomRight" />
+                <TextBox x:Name="txtLatBR" Text="-50" />
+                <TextBlock Margin="0,10,0,0" Text="LongBottomRight" />
+                <TextBox x:Name="txtLongBR" Text="50" />
+                <TextBlock Margin="0,10,0,0" Text="ZoomLevel" />
+                <TextBox x:Name="txtZoomLevel" Text="4" />
+                <Button x:Name="btnDownload" Click="BtnDownload_Click" Margin="35,15,35,0" Height="35" Content="Download1" />
+                <Button x:Name="btnCancel" Click="BtnCancel_Click" Margin="35,10,35,0" Height="35" Content="Cancel" />
+                
+                <TextBlock Margin="0,10,0,5" Text="Progress" />
+                <ProgressBar x:Name="progressAllFile" Height="15" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
