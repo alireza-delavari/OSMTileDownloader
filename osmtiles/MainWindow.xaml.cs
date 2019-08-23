@@ -89,7 +89,7 @@ namespace osmtiles
 
             await Task.Run(() =>
             {
-                DownloadRange(zoom, minx, maxx, miny, maxy);
+                DownloadRangeAsync(zoom, minx, maxx, miny, maxy);
             });
             //await DownloadRange(zoom, minx, maxx, miny, maxy);
 
@@ -99,9 +99,10 @@ namespace osmtiles
             }
         }
 
-        private void DownloadRange(int zoom, int minx, int maxx, int miny, int maxy)
+        private async Task DownloadRangeAsync(int zoom, int minx, int maxx, int miny, int maxy)
         {
-            ThreadPool.SetMaxThreads(2, 2);
+            //ThreadPool.SetMaxThreads(2, 2);
+            int threadsCount = 2;
             Random random = new Random(DateTime.Now.Millisecond);
             string[] subs = { "a", "b", "c" };
             string url1 = @"https://";
@@ -133,7 +134,25 @@ namespace osmtiles
                         }
                         Directory.CreateDirectory(directory);
 
-                        ThreadPool.QueueUserWorkItem(async (obj) => { await DownloadFile(url, filename); });
+                        //while (threadsCount < 1) ;
+                        //threadsCount--;
+                        //ThreadPool.QueueUserWorkItem(async (obj) => { await DownloadFile(url, filename); });
+                        if (threadsCount > 1)
+                        {
+                            threadsCount--;
+                            Thread thread = new Thread(async () =>
+                            {
+                                await DownloadFile(url, filename);
+                                threadsCount++;
+                            });
+                            thread.Start();
+                            //threadsCount++;
+                        }
+                        else
+                        {
+                            await DownloadFile(url, filename);
+                        }
+
                     }
                     catch (Exception)
                     {
@@ -147,10 +166,14 @@ namespace osmtiles
         {
             try
             {
+                if (_cancelFlag)
+                    return;
                 using (WebClient client = new WebClient())
                 {
-                    SetHeaders(client);
+                    //SetHeaders(client);
+                    SetHeaders2(client);
                     client.DownloadFileCompleted += Client_DownloadFileCompleted;
+                    //Thread.Sleep(800);
                     await client.DownloadFileTaskAsync(new Uri(url), filename);
                     //System.Diagnostics.Debug.WriteLine(url);
                 }
@@ -163,10 +186,14 @@ namespace osmtiles
 
         private void Client_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
-            App.Current.Dispatcher.Invoke(() =>
+            try
             {
-                progressAllFile.Value++;
-            });
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    progressAllFile.Value++;
+                });
+            }
+            catch (Exception) { }
         }
 
         private static void SetHeaders(WebClient client)
@@ -177,12 +204,25 @@ namespace osmtiles
             client.Headers.Add(HttpRequestHeader.AcceptLanguage, "en,en-US;q=0.9,fa;q=0.8");
             client.Headers.Add(HttpRequestHeader.CacheControl, "max-age=0");
             client.Headers.Add(HttpRequestHeader.Cookie, "_osm_totp_token=906161");
-            client.Headers.Add(HttpRequestHeader.IfNoneMatch, "a5165d635f3b598a0e063b7a02030a56");
+            //client.Headers.Add(HttpRequestHeader.IfNoneMatch, "a5165d635f3b598a0e063b7a02030a56");
             client.Headers.Add("sec-fetch-mode", "navigate");
             client.Headers.Add("sec-fetch-site", "none");
             client.Headers.Add("sec-fetch-user", "?1");
-            client.Headers.Add("sec-fetch-mode", "navigate");
+            //client.Headers.Add("sec-fetch-mode", "navigate");
             client.Headers.Add("upgrade-insecure-requests", "1");
+            client.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36");
+        }
+        private static void SetHeaders2(WebClient client)
+        {
+            //client.Headers.Add(HttpRequestHeader.Accept, "text/html,application/xhtml+xml" +
+            //                    ",application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
+            client.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate, br");
+            client.Headers.Add(HttpRequestHeader.AcceptLanguage, "en,en-US;q=0.9,fa;q=0.8");
+            //client.Headers.Add(HttpRequestHeader.Cookie, "_osm_totp_token=906161");
+
+            client.Headers.Add(HttpRequestHeader.Referer, "https://www.openstreetmap.org/");
+            client.Headers.Add("Sec-Fetch-Mode", "no-cors");
             client.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
                 "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36");
         }
