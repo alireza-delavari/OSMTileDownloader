@@ -83,15 +83,26 @@ namespace osmtiles
             int miny = 0;
             int maxy = maxx;
             int totalTiles = maxx * maxy;
+            int threadsCount = int.TryParse(txtThreadCount.Text.ToString(), out int thCount) ? thCount : 2;
 
             progressAllFile.Maximum = totalTiles;
             progressAllFile.Value = 0;
 
+            var tStart = DateTime.Now;
+            txtOutput.Text += Environment.NewLine + tStart.ToString("hh:mm:ss ffff");
+            txtOutput.Text += Environment.NewLine + ((tStart.Hour * 60 * 60) + (tStart.Minute * 60) + tStart.Second).ToString();
+
+            txtStatus.Text = "Downloading";
             await Task.Run(async () =>
             {
-                await DownloadRangeAsync(zoom, minx, maxx, miny, maxy);
+                await DownloadRangeAsync(zoom, minx, maxx, miny, maxy, threadsCount, @"out3\");
             });
             //await DownloadRange(zoom, minx, maxx, miny, maxy);
+            txtStatus.Text = "Complete";
+
+            var tEnd = DateTime.Now;
+            txtOutput.Text += Environment.NewLine + tEnd.ToString("hh:mm:ss ffff");
+            txtOutput.Text += Environment.NewLine + ((tEnd.Hour * 60 * 60) + (tEnd.Minute * 60) + tEnd.Second).ToString();
 
             if (_cancelFlag)
             {
@@ -114,15 +125,26 @@ namespace osmtiles
             int miny = (int)Math.Min(pTL.Y, pBL.Y);
             int maxy = (int)Math.Max(pTL.Y, pBL.Y);
             int totalTiles = (maxx - minx) * (maxy - miny);
+            int threadsCount = int.TryParse(txtThreadCount.Text.ToString(), out int thCount) ? thCount : 2;
             ////string url = @"https://a.tile.openstreetmap.org/${z}/${x}/${y}.png";
             progressAllFile.Maximum = totalTiles;
             progressAllFile.Value = 0;
 
+            var tStart = DateTime.Now;
+            txtOutput.Text += Environment.NewLine + tStart.ToString("hh:mm:ss ffff");
+            txtOutput.Text += Environment.NewLine + ((tStart.Hour * 60 * 60) + (tStart.Minute * 60) + tStart.Second).ToString();
+
+            txtStatus.Text = "Downloading";
             await Task.Run(async () =>
             {
-                await DownloadRangeAsync(zoom, minx, maxx, miny, maxy);
+                await DownloadRangeAsync(zoom, minx, maxx, miny, maxy, threadsCount, @"out3\");
             });
             //await DownloadRange(zoom, minx, maxx, miny, maxy);
+            txtStatus.Text = "Complete";
+
+            var tEnd = DateTime.Now;
+            txtOutput.Text += Environment.NewLine + tEnd.ToString("hh:mm:ss ffff");
+            txtOutput.Text += Environment.NewLine + ((tEnd.Hour * 60 * 60) + (tEnd.Minute * 60) + tEnd.Second).ToString();
 
             if (_cancelFlag)
             {
@@ -130,13 +152,13 @@ namespace osmtiles
             }
         }
 
-        private async Task DownloadRangeAsync(int zoom, int minx, int maxx, int miny, int maxy)
+        private async Task DownloadRangeAsync(int zoom, int minx, int maxx, int miny, int maxy, int threadsCount, string baseDirectory)
         {
             //ThreadPool.SetMaxThreads(2, 2);
-            int threadsCount = 2;
             Random random = new Random(DateTime.Now.Millisecond);
             string[] subs = { "a", "b", "c" };
             string url1 = @"https://";
+            //string baseDirectory = @"out3\";
             for (double x = minx; x < maxx; x++)
             {
                 if (_cancelFlag)
@@ -150,7 +172,6 @@ namespace osmtiles
                         string url2 = @".tile.openstreetmap.org/" + zoom + "/" + (int)x + "/" + (int)y + ".png";
                         int rnd = random.Next(0, 3);
                         string url = url1 + subs[rnd] + url2;
-                        string baseDirectory = @"out3\";
                         string zoomDirectory = baseDirectory + zoom.ToString() + @"\";
                         string xDirectory = zoomDirectory + x.ToString() + @"\";
                         string filename = xDirectory + y.ToString() + ".png";

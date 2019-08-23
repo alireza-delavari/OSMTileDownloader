@@ -6,12 +6,12 @@
         xmlns:local="clr-namespace:osmtiles"
         
         mc:Ignorable="d"
-        Title="MainWindow" Height="550" Width="260">
+        Title="MainWindow" Height="600" Width="265">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
     </Window.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions>    
             <ColumnDefinition Width="250" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
@@ -29,13 +29,22 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBox x:Name="txtZoomLevel" Width="60" Text="4" />
                     <TextBlock Margin="10,0,0,0" Text="Get from above coordinate:" VerticalAlignment="Center" />
-                    <CheckBox x:Name="chbGetFromLatLong" IsChecked="True" Margin="5,0,0,0" VerticalAlignment="Center" />
+                    <CheckBox x:Name="chbGetFromLatLong" IsChecked="False" Margin="5,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
+                <TextBlock Margin="0,10,0,0" Text="Thread Count" />
+                <TextBox x:Name="txtThreadCount" Text="2" />
+                
                 <Button x:Name="btnDownload" Click="BtnDownload_Click" Margin="35,15,35,0" Height="35" Content="Download1" />
                 <Button x:Name="btnCancel" Click="BtnCancel_Click" Margin="35,10,35,0" Height="35" Content="Cancel" />
 
                 <TextBlock Margin="0,10,0,5" Text="Progress" />
                 <ProgressBar x:Name="progressAllFile" Height="15" />
+
+                <StackPanel Margin="0,10,0,0"  Orientation="Horizontal">
+                    <TextBlock Text="Status:" />
+                    <TextBlock x:Name="txtStatus" Margin="15,0,0,0" Text="Ready" />
+                </StackPanel>
+                <TextBox x:Name="txtOutput" Margin="0,15,0,0" Height="100" />
             </StackPanel>
         </Grid>
     </Grid>
