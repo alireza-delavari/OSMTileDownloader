@@ -24,6 +24,7 @@ namespace osmtiles
     /// </summary>
     public partial class MainWindow : Window
     {
+        string _baseDirectory = @"out3\";
         bool _cancelFlag = false;
         public MainWindow()
         {
@@ -95,7 +96,7 @@ namespace osmtiles
             txtStatus.Text = "Downloading";
             await Task.Run(async () =>
             {
-                await DownloadRangeAsync(zoom, minx, maxx, miny, maxy, threadsCount, @"out3\");
+                await DownloadRangeAsync(zoom, minx, maxx, miny, maxy, threadsCount, _baseDirectory);
             });
             //await DownloadRange(zoom, minx, maxx, miny, maxy);
             txtStatus.Text = "Complete";
@@ -137,7 +138,7 @@ namespace osmtiles
             txtStatus.Text = "Downloading";
             await Task.Run(async () =>
             {
-                await DownloadRangeAsync(zoom, minx, maxx, miny, maxy, threadsCount, @"out3\");
+                await DownloadRangeAsync(zoom, minx, maxx, miny, maxy, threadsCount, _baseDirectory);
             });
             //await DownloadRange(zoom, minx, maxx, miny, maxy);
             txtStatus.Text = "Complete";
