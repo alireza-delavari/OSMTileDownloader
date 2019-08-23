@@ -4,8 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:osmtiles"
+        
         mc:Ignorable="d"
         Title="MainWindow" Height="550" Width="260">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250" />
@@ -14,18 +18,22 @@
         <Grid Grid.Column="0">
             <StackPanel Margin="5,10">
                 <TextBlock Margin="0,10,0,0" Text="LatTopLeft" />
-                <TextBox x:Name="txtLatTL" Text="50" />
+                <TextBox x:Name="txtLatTL" IsEnabled="{Binding ElementName=chbGetFromLatLong, Path=IsChecked}" Text="50" />
                 <TextBlock Margin="0,10,0,0" Text="LongTopLeft" />
-                <TextBox x:Name="txtLongTL" Text="-50" />
+                <TextBox x:Name="txtLongTL" IsEnabled="{Binding ElementName=chbGetFromLatLong, Path=IsChecked}" Text="-50" />
                 <TextBlock Margin="0,10,0,0" Text="LatBottomRight" />
-                <TextBox x:Name="txtLatBR" Text="-50" />
+                <TextBox x:Name="txtLatBR" IsEnabled="{Binding ElementName=chbGetFromLatLong, Path=IsChecked}" Text="-50" />
                 <TextBlock Margin="0,10,0,0" Text="LongBottomRight" />
-                <TextBox x:Name="txtLongBR" Text="50" />
+                <TextBox x:Name="txtLongBR" IsEnabled="{Binding ElementName=chbGetFromLatLong, Path=IsChecked}" Text="50" />
                 <TextBlock Margin="0,10,0,0" Text="ZoomLevel" />
-                <TextBox x:Name="txtZoomLevel" Text="4" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBox x:Name="txtZoomLevel" Width="60" Text="4" />
+                    <TextBlock Margin="10,0,0,0" Text="Get from above coordinate:" VerticalAlignment="Center" />
+                    <CheckBox x:Name="chbGetFromLatLong" IsChecked="True" Margin="5,0,0,0" VerticalAlignment="Center" />
+                </StackPanel>
                 <Button x:Name="btnDownload" Click="BtnDownload_Click" Margin="35,15,35,0" Height="35" Content="Download1" />
                 <Button x:Name="btnCancel" Click="BtnCancel_Click" Margin="35,10,35,0" Height="35" Content="Cancel" />
-                
+
                 <TextBlock Margin="0,10,0,5" Text="Progress" />
                 <ProgressBar x:Name="progressAllFile" Height="15" />
             </StackPanel>

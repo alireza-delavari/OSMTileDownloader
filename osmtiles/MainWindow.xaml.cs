@@ -35,12 +35,19 @@ namespace osmtiles
             try
             {
                 _cancelFlag = false;
-                StartDownloadAll(
-                    double.Parse(txtLatTL.Text)
-                    , double.Parse(txtLongTL.Text)
-                    , double.Parse(txtLatBR.Text)
-                    , double.Parse(txtLongBR.Text)
-                    , int.Parse(txtZoomLevel.Text));
+                if (chbGetFromLatLong.IsChecked.GetValueOrDefault(false))
+                {
+                    DownloadLatLong(
+                        double.Parse(txtLatTL.Text)
+                        , double.Parse(txtLongTL.Text)
+                        , double.Parse(txtLatBR.Text)
+                        , double.Parse(txtLongBR.Text)
+                        , int.Parse(txtZoomLevel.Text));
+                }
+                else
+                {
+                    DownloadAll(int.Parse(txtZoomLevel.Text));
+                }
             }
             catch (Exception ex)
             {
@@ -68,7 +75,31 @@ namespace osmtiles
 
             return p;
         }
-        public async void StartDownloadAll(double latT, double longL, double latB, double longR, int zoom)
+
+        public async void DownloadAll(int zoom)
+        {
+            int minx = 0;
+            int maxx = (int)Math.Pow((double)2, (double)zoom);
+            int miny = 0;
+            int maxy = maxx;
+            int totalTiles = maxx * maxy;
+
+            progressAllFile.Maximum = totalTiles;
+            progressAllFile.Value = 0;
+
+            await Task.Run(async () =>
+            {
+                await DownloadRangeAsync(zoom, minx, maxx, miny, maxy);
+            });
+            //await DownloadRange(zoom, minx, maxx, miny, maxy);
+
+            if (_cancelFlag)
+            {
+                _cancelFlag = false;
+            }
+        }
+
+        public async void DownloadLatLong(double latT, double longL, double latB, double longR, int zoom)
         {
             //var pTL = WorldToTilePos(latL, longT, 4);
             //var pTR = WorldToTilePos(latR, longT, 4);
@@ -87,9 +118,9 @@ namespace osmtiles
             progressAllFile.Maximum = totalTiles;
             progressAllFile.Value = 0;
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                DownloadRangeAsync(zoom, minx, maxx, miny, maxy);
+                await DownloadRangeAsync(zoom, minx, maxx, miny, maxy);
             });
             //await DownloadRange(zoom, minx, maxx, miny, maxy);
 
@@ -119,8 +150,14 @@ namespace osmtiles
                         string url2 = @".tile.openstreetmap.org/" + zoom + "/" + (int)x + "/" + (int)y + ".png";
                         int rnd = random.Next(0, 3);
                         string url = url1 + subs[rnd] + url2;
-                        string directory = @"out2\";
-                        string filename = directory + zoom.ToString() + "_" + x.ToString() + "_" + y.ToString() + ".png";
+                        string baseDirectory = @"out3\";
+                        string zoomDirectory = baseDirectory + zoom.ToString() + @"\";
+                        string xDirectory = zoomDirectory + x.ToString() + @"\";
+                        string filename = xDirectory + y.ToString() + ".png";
+                        Directory.CreateDirectory(baseDirectory);
+                        Directory.CreateDirectory(zoomDirectory);
+                        Directory.CreateDirectory(xDirectory);
+                        //string filename2 = baseDirectory + zoom.ToString() + "_" + x.ToString() + "_" + y.ToString() + ".png";
                         if (File.Exists(filename))
                         {
                             if (IsValidImage(filename))
@@ -132,7 +169,6 @@ namespace osmtiles
                                 continue;
                             }
                         }
-                        Directory.CreateDirectory(directory);
 
                         //while (threadsCount < 1) ;
                         //threadsCount--;
